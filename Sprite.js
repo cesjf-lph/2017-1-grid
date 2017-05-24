@@ -4,9 +4,98 @@ function Sprite() {
   this.vx = 0;
   this.vy = 0;
   this.SIZE = 15;
+  this.imageLib;
+  this.pose = 0;
+  this.frame = 0;
+  this.poses = [
+    {
+      key: "pc",
+      row: 11,
+      col: 0,
+      colMax: 7,
+      time: 8
+    },
+    {
+      key: "pc",
+      row: 10,
+      col: 0,
+      colMax: 7,
+      time: 8
+    },
+    {
+      key: "pc",
+      row: 9,
+      col: 0,
+      colMax: 7,
+      time: 8
+    },
+    {
+      key: "pc",
+      row: 8,
+      col: 0,
+      colMax: 7,
+      time: 8
+    },
+    {
+      key: "pc",
+      row: 11,
+      col: 0,
+      colMax: 0,
+      time: 8
+    },
+    {
+      key: "pc",
+      row: 10,
+      col: 0,
+      colMax: 0,
+      time: 8
+    },
+    {
+      key: "pc",
+      row: 9,
+      col: 0,
+      colMax: 0,
+      time: 8
+    },
+    {
+      key: "pc",
+      row: 8,
+      col: 0,
+      colMax: 0,
+      time: 8
+    },
+
+  ]
 }
 
 Sprite.prototype.desenhar = function(ctx) {
+  this.desenharPose(ctx);
+  if(this.debug) this.desenharLimites(ctx);
+
+}
+
+Sprite.prototype.desenharPose = function(ctx) {
+  ctx.fillStyle = "black";
+  ctx.globalAlpha = 0.4;
+  ctx.beginPath();
+  ctx.arc(this.x, this.y+3, this.SIZE/2, 0, 2*Math.PI);
+  ctx.closePath();
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  this.imageLib.drawImageTile(ctx,
+    this.poses[this.pose].key,
+    this.poses[this.pose].row,
+    this.poses[this.pose].col + Math.floor(this.frame),
+    64,
+    this.x - 32, this.y - 53
+  );
+  /*
+  ctx.fillStyle = "white";
+  ctx.fillText(Math.floor(this.frame), this.x, this.y);
+  console.log(Math.floor(this.frame));*/
+}
+
+Sprite.prototype.desenharLimites = function(ctx) {
   ctx.fillStyle = "blue";
   ctx.fillRect(
     this.x - this.SIZE / 2,
@@ -28,8 +117,12 @@ Sprite.prototype.mover = function(dt) {
 };
 
 Sprite.prototype.moverOnMap = function(map, dt) {
+  this.frame += this.poses[this.pose].time * dt;
+  if (this.frame > this.poses[this.pose].colMax + 1) {
+    this.frame = this.poses[this.pose].col;
+  }
   var pos = map.getIndices(this);
-  if (map.cells[pos.l][pos.c] != 0) return;
+  //if (map.cells[pos.l][pos.c] != 0) return;
 
   if (this.vx > 0 && map.cells[pos.l][pos.c + 1] != 0) {
     var dist = (pos.c + 1) * map.SIZE - (this.x + this.SIZE / 2);
@@ -60,6 +153,19 @@ Sprite.prototype.moverOnMap = function(map, dt) {
 
 Sprite.prototype.persegue = function(alvo) {
   var dist = Math.sqrt(Math.pow(alvo.x - this.x, 2) + Math.pow(alvo.y - this.y, 2));
-this.vx = 40 * (alvo.x - this.x) / dist;
-this.vy = 40 * (alvo.y - this.y) / dist;
+  this.vx = 40 * (alvo.x - this.x) / dist;
+  this.vy = 40 * (alvo.y - this.y) / dist;
+  if (Math.abs(this.vy) > Math.abs(this.vx)) {
+    if (this.vy > 0) {
+      this.pose = 1;
+    } else {
+      this.pose = 3;
+    }
+  } else {
+    if (this.vx > 0) {
+      this.pose = 0;
+    } else {
+      this.pose = 2;
+    }
+  }
 };

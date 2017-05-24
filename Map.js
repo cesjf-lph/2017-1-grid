@@ -1,7 +1,8 @@
 function Map(l, c) {
-  this.SIZE = 40;
+  this.SIZE = 32;
   this.cells = [];
   this.enemies = [];
+  this.imageLib = null;
 
   for (var i = 0; i < l; i++) {
     this.cells[i] = [];
@@ -10,8 +11,12 @@ function Map(l, c) {
     }
   }
 }
+Map.prototype.desenhar = function(ctx){
+  this.desenharLimites(ctx);
+  this.desenharTiles(ctx);
+}
 
-Map.prototype.desenhar = function(ctx) {
+Map.prototype.desenharLimites = function(ctx) {
   for (var i = 0; i < this.cells.length; i++) {
     var linha = this.cells[i];
     for (var j = 0; j < linha.length; j++) {
@@ -28,6 +33,24 @@ Map.prototype.desenhar = function(ctx) {
         default:
           ctx.fillStyle = 'red';
           ctx.fillRect(j * this.SIZE, i * this.SIZE, this.SIZE, this.SIZE);
+      }
+    }
+  }
+  this.desenharInimigos(ctx);
+};
+Map.prototype.desenharTiles = function(ctx) {
+  for (var i = 0; i < this.cells.length; i++) {
+    var linha = this.cells[i];
+    for (var j = 0; j < linha.length; j++) {
+      switch (this.cells[i][j]) {
+        case 0:
+          this.imageLib.drawImageTile(ctx, "floor", 3, 1, 32, j*this.SIZE, i*this.SIZE);
+          break;
+        case 1:
+          this.imageLib.drawImageTile(ctx, "floor", 3, 1, 32, j*this.SIZE, i*this.SIZE);
+          this.imageLib.drawImageTile(ctx, "mountain", 7, 10, 32, j*this.SIZE, i*this.SIZE);
+          break;
+        default:
       }
     }
   }
@@ -63,6 +86,7 @@ Map.prototype.getIndices = function (sprite) {
 
 Map.prototype.criaInimigo = function (l,c) {
   var inimigo = new Sprite();
+  inimigo.imageLib = this.imageLib;
   inimigo.x = (c+0.5)*this.SIZE;
   inimigo.y = (l+0.5)*this.SIZE;
   this.enemies.push(inimigo);
