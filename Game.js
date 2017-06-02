@@ -11,6 +11,8 @@ function init() {
   tela.width = 600;
   tela.height = 480;
   ctx = tela.getContext('2d');
+  soundLib = new SoundLoader();
+  soundLib.load("punch", "mp3/punch.mp3");
   imglib = new ImageLoader();
   imglib.load("pc", "pc.png");
   imglib.load("floor", "LPC Base Assets/tiles/dirt2.png");
@@ -81,6 +83,9 @@ function configuraControles() {
   });
   addEventListener("keyup", function(e) {
     switch (e.keyCode) {
+      case 32:
+        soundLib.play("punch");
+      break;
       case 37:
         pc.vx = 0;
         pc.pose = 6;
